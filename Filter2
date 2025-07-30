@@ -1,0 +1,39 @@
+module tb_fir_filter;
+
+    reg clk, reset;
+    reg signed [7:0] x;
+    wire signed [15:0] y;
+
+    // Instantiate FIR filter
+    fir_filter uut (
+        .clk(clk),
+        .reset(reset),
+        .x(x),
+        .y(y)
+    );
+
+    // Clock generation
+    initial clk = 0;
+    always #5 clk = ~clk;
+
+    initial begin
+        $dumpfile("dump.vcd");
+        $dumpvars(0, tb_fir_filter);
+        $monitor("Time=%0t | x=%d | y=%d", $time, x, y);
+
+        // Reset
+        reset = 1;
+        #10 reset = 0;
+
+        // Input signal samples
+        x = 8'd1; #10;
+        x = 8'd2; #10;
+        x = 8'd3; #10;
+        x = 8'd4; #10;
+        x = 8'd5; #10;
+        x = 8'd0; #10;
+        x = 8'd0; #50;
+
+        $finish;
+    end
+endmodule
