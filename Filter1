@@ -1,0 +1,36 @@
+// Simple 4-tap FIR Filter
+module fir_filter (
+    input clk,
+    input reset,
+    input signed [7:0] x, // Input signal
+    output reg signed [15:0] y // Filtered output
+);
+
+    // Filter coefficients (example: moving average filter)
+    parameter signed [7:0] h0 = 8'd1;
+    parameter signed [7:0] h1 = 8'd2;
+    parameter signed [7:0] h2 = 8'd2;
+    parameter signed [7:0] h3 = 8'd1;
+
+    // Shift registers for input samples
+    reg signed [7:0] x_reg0, x_reg1, x_reg2, x_reg3;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            x_reg0 <= 0;
+            x_reg1 <= 0;
+            x_reg2 <= 0;
+            x_reg3 <= 0;
+            y <= 0;
+        end else begin
+            // Shift inputs
+            x_reg3 <= x_reg2;
+            x_reg2 <= x_reg1;
+            x_reg1 <= x_reg0;
+            x_reg0 <= x;
+
+            // Convolution operation: y = h0*x0 + h1*x1 + h2*x2 + h3*x3
+            y <= (h0 * x_reg0) + (h1 * x_reg1) + (h2 * x_reg2) + (h3 * x_reg3);
+        end
+    end
+endmodule
